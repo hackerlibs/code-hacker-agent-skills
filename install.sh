@@ -24,8 +24,8 @@ if ! "$PYTHON_CMD" -c 'import sys; assert sys.version_info >= (3,8)' >/dev/null 
   error "Python 3.8+ is required. Detected: $($PYTHON_CMD --version 2>&1 | head -n 1)"
 fi
 
-if [ ! -f code-hacker-skills.agent.md ]; then
-  error "Manifest file code-hacker-skills.agent.md not found in repository root."
+if [ ! -f code-hacker-agent.agent.md ]; then
+  error "Manifest file code-hacker-agent.agent.md not found in repository root."
 fi
 
 if [ ! -d skills ]; then
@@ -35,7 +35,7 @@ fi
 if [ "$TARGET_DIR" != "$ROOT_DIR" ]; then
   info "Installing custom agent files into: $TARGET_DIR"
   mkdir -p "$TARGET_DIR"
-  cp -R code-hacker-skills.agent.md "$TARGET_DIR/"
+  cp -R code-hacker-agent.agent.md "$TARGET_DIR/"
   rm -rf "$TARGET_DIR/skills"
   cp -R skills "$TARGET_DIR/"
   info "Copied manifest and skills/ into target workspace."
@@ -62,4 +62,4 @@ else
 fi
 
 info "Install script complete."
-info "Open $TARGET_DIR in VS Code and load code-hacker-skills.agent.md as a custom Copilot Chat agent."
+info "Open $TARGET_DIR in VS Code and load code-hacker-agent.agent.md as a custom Copilot Chat agent."

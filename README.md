@@ -4,7 +4,7 @@ A small repository containing local skill wrappers for a VS Code Copilot-like ag
 
 ## Project structure
 
-- `code-hacker-skills.agent.md` — agent manifest and guidance for using the skills.
+- `code-hacker-agent.agent.md` — agent manifest and guidance for using the skills.
 - `skills/filesystem/` — `fs.py` and its `SKILL.md`, a local filesystem skill wrapper.
 - `skills/git-tools/` — `git_ops.py` and its `SKILL.md`, a git wrapper skill.
 - `skills/memory/` — `memory.py` and its `SKILL.md`, a persistent memory skill.
@@ -17,7 +17,7 @@ This repository provides reusable CLI skill implementations for environments whe
 ## Usage examples
 
 - Read a file:
-  `python skills/filesystem/fs.py read_file code-hacker-skills.agent.md`
+  `python skills/filesystem/fs.py read_file code-hacker-agent.agent.md`
 - Inspect git status:
   `python skills/git-tools/git_ops.py status`
 - Save or query agent memory:
@@ -30,15 +30,15 @@ This repository provides reusable CLI skill implementations for environments whe
 1. Open this repository folder in VS Code.
 2. Install the GitHub Copilot Chat extension if it is not already installed.
 3. Sign in to Copilot Chat and open the Copilot Chat panel.
-4. The `code-hacker-skills.agent.md` manifest is located at the repository root. Copilot Chat should detect it as a custom agent in the Agents or Custom Agents list.
+4. The `code-hacker-agent.agent.md` manifest is located at the repository root. Copilot Chat should detect it as a custom agent in the Agents or Custom Agents list.
 5. Select the custom agent named `Code Hacker (Skills Edition)` or import the manifest file if the extension provides an import action.
 6. Ask questions in the chat. The agent can use the local skill wrappers under `skills/` to inspect files, run git operations, manage memory, and coordinate multi-project tasks.
 
 ## Installing the custom agent to VS Code
 
-- This repository is not a VS Code extension. The custom agent is enabled by opening the repo in VS Code and loading the `code-hacker-skills.agent.md` manifest through GitHub Copilot Chat.
+- This repository is not a VS Code extension. The custom agent is enabled by opening the repo in VS Code and loading the `code-hacker-agent.agent.md` manifest through GitHub Copilot Chat.
 - Make sure Python 3 is installed on your system, because the skill scripts are Python CLI wrappers.
-- If you want to reuse the agent in another workspace, copy `code-hacker-skills.agent.md` into that workspace root or import it through the Copilot Chat custom agent interface.
+- If you want to reuse the agent in another workspace, copy `code-hacker-agent.agent.md` into that workspace root or import it through the Copilot Chat custom agent interface.
 
 ## Install scripts
 
@@ -52,7 +52,7 @@ You can also install into another workspace by passing a target directory:
 - `./install.sh /path/to/other/workspace`
 - `./install.ps1 -TargetDir 'C:\path\to\other\workspace'`
 
-In that case, the script copies `code-hacker-skills.agent.md` and the `skills/` directory into the target workspace root.
+In that case, the script copies `code-hacker-agent.agent.md` and the `skills/` directory into the target workspace root.
 
 ## Notes
 

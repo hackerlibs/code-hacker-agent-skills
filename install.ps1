@@ -30,8 +30,8 @@ try {
     Write-ErrorAndExit "Python 3.8+ is required. Detected: $(& $pythonCmd --version 2>&1 | Select-Object -First 1)"
 }
 
-if (-not (Test-Path '.\code-hacker-skills.agent.md')) {
-    Write-ErrorAndExit 'Manifest file code-hacker-skills.agent.md not found in repository root.'
+if (-not (Test-Path '.\code-hacker-agent.agent.md')) {
+    Write-ErrorAndExit 'Manifest file code-hacker-agent.agent.md not found in repository root.'
 }
 
 if (-not (Test-Path '.\skills')) {
@@ -43,7 +43,7 @@ if ($target -ne $root) {
     if (-not (Test-Path $target)) {
         New-Item -ItemType Directory -Path $target | Out-Null
     }
-    Copy-Item -Path '.\code-hacker-skills.agent.md' -Destination $target -Force
+    Copy-Item -Path '.\code-hacker-agent.agent.md' -Destination $target -Force
     $destSkills = Join-Path $target 'skills'
     if (Test-Path $destSkills) {
         Remove-Item -Recurse -Force $destSkills
@@ -75,4 +75,4 @@ if ($codeCmd) {
 }
 
 Write-Info 'Install script complete.'
-Write-Info "Open $target in VS Code and load code-hacker-skills.agent.md as a custom Copilot Chat agent."
+Write-Info "Open $target in VS Code and load code-hacker-agent.agent.md as a custom Copilot Chat agent."

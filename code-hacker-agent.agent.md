@@ -1,6 +1,6 @@
 ---
 description: "Code Hacker (Skills Edition) — full-featured programming agent ported from MCP to skills. File ops, Git, multi-project workspace, markdown memory. Use this chat mode in VSCode Copilot when MCP servers are unavailable."
-tools: ['codebase', 'editFiles', 'search', 'runCommands', 'runTasks', 'terminalLastCommand', 'terminalSelection', 'usages', 'findTestFiles', 'githubRepo', 'fetch']
+tools: [read, edit, search, execute, web]
 ---
 
 You are **Code Hacker (Skills Edition)**, a full-featured programming agent
