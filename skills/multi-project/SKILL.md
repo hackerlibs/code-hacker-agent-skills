@@ -156,6 +156,14 @@ python skills/multi-project/workspace.py workspace_exec api "pytest tests/order"
 python skills/multi-project/workspace.py workspace_exec web "npm run typecheck"
 ```
 
+## Search backend
+
+`workspace_search` and `workspace_find_dependencies` use **ripgrep (`rg`)**
+under the hood. The binary is resolved from the `RG_PATH` environment
+variable (default `/usr/local/bin/rg`); if ripgrep is missing the script
+falls back to plain `grep -rn`. Set `RG_PATH=/opt/homebrew/bin/rg` (or
+similar) if your install lives elsewhere.
+
 ## Safety rules
 
 - Destructive commands (`rm`, `format`, `dd`, `shutdown`, ...) are blocked

@@ -7,7 +7,11 @@ called directly from the VSCode Copilot agent via the terminal:
 
     python skills/filesystem/fs.py read_file path/to/file.py
     python skills/filesystem/fs.py edit_file path/to/file.py --old-file /tmp/old --new-file /tmp/new
-    python skills/filesystem/fs.py search_files_ag "TODO" src --file-type py
+    python skills/filesystem/fs.py search_files_rg "TODO" src --file-type py
+
+The content search subcommand uses ripgrep (`rg`). Override the binary with
+the RG_PATH environment variable (default: /usr/local/bin/rg). If ripgrep is
+unavailable the script falls back to plain `grep -rn`.
 
 Dangerous shell commands (rm, format, dd, ...) are blocked in execute_command.
 """
@@ -30,6 +34,7 @@ ALLOWED_EXTENSIONS = {
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 BLOCKED_COMMANDS = {'rm', 'del', 'format', 'mkfs', 'dd', 'shutdown', 'reboot', 'halt', 'poweroff'}
 DEFAULT_ENCODING = 'utf-8'
+RG_DEFAULT_PATH = '/usr/local/bin/rg'
 
 
 # ─── Helpers ────────────────────────────────────────────────────────────────
@@ -343,28 +348,28 @@ def cmd_create_directory(args) -> int:
     return 0
 
 
-def cmd_search_files_ag(args) -> int:
+def cmd_search_files_rg(args) -> int:
     if not is_safe_path(args.search_path):
         print(f"Error: Unsafe search path: {args.search_path}"); return 1
     path = Path(args.search_path)
     if not path.exists() or not path.is_dir():
         print(f"Error: Search path is not a directory: {args.search_path}"); return 1
 
-    ag_bin = os.environ.get('AG_PATH', 'ag')
-    use_ag = True
+    rg_bin = os.environ.get('RG_PATH', RG_DEFAULT_PATH)
+    use_rg = True
     try:
-        subprocess.run([ag_bin, '--version'], capture_output=True, check=True)
+        subprocess.run([rg_bin, '--version'], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
-        use_ag = False
+        use_rg = False
 
-    if use_ag:
-        cmd = [ag_bin, '--nocolor', '--numbers']
+    if use_rg:
+        cmd = [rg_bin, '--color=never', '-n']
         if not args.case_sensitive:
             cmd.append('-i')
         if args.context_lines > 0:
             cmd.extend(['-C', str(args.context_lines)])
         if args.file_type:
-            cmd.append(f"--{args.file_type.lstrip('.')}")
+            cmd.extend(['-t', args.file_type.lstrip('.')])
         cmd.extend(['-m', str(args.max_results), args.pattern, str(path.absolute())])
     else:
         # Fallback: grep -rn
@@ -473,14 +478,14 @@ def main():
     sp.add_argument('directory_path')
     sp.set_defaults(func=cmd_create_directory)
 
-    sp = sub.add_parser('search_files_ag', help='Search file contents with ag (or grep fallback)')
+    sp = sub.add_parser('search_files_rg', help='Search file contents with rg / ripgrep (grep fallback)')
     sp.add_argument('pattern')
     sp.add_argument('search_path', nargs='?', default='.')
-    sp.add_argument('--file-type', default=None, help="e.g. py, js, clj")
+    sp.add_argument('--file-type', default=None, help="ripgrep type, e.g. py, js, clj")
     sp.add_argument('--case-sensitive', action='store_true')
-    sp.add_argument('--max-results', type=int, default=100)
+    sp.add_argument('--max-results', type=int, default=100, help="max matches per file (rg -m)")
     sp.add_argument('--context-lines', type=int, default=0)
-    sp.set_defaults(func=cmd_search_files_ag)
+    sp.set_defaults(func=cmd_search_files_rg)
 
     args = p.parse_args()
     sys.exit(args.func(args) or 0)

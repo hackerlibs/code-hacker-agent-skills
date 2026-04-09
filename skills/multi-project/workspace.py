@@ -50,6 +50,8 @@ KNOWN_EXTENSIONLESS = {'Jenkinsfile', 'Dockerfile', 'Makefile', 'Vagrantfile', '
 
 BLOCKED_COMMANDS = {'rm', 'del', 'format', 'mkfs', 'dd', 'shutdown', 'reboot', 'halt', 'poweroff'}
 
+RG_DEFAULT_PATH = '/usr/local/bin/rg'
+
 
 # ─── Workspace state ────────────────────────────────────────────────────────
 def _load_workspace() -> dict:
@@ -187,11 +189,12 @@ def cmd_workspace_list(args) -> int:
 # ═══════════════════════════════════════════════════════════════════════════
 #  Cross-project search
 # ═══════════════════════════════════════════════════════════════════════════
-def _check_ag() -> Optional[str]:
-    ag_bin = os.environ.get('AG_PATH', 'ag')
+def _check_rg() -> Optional[str]:
+    """Locate ripgrep: honour RG_PATH, then default /usr/local/bin/rg."""
+    rg_bin = os.environ.get('RG_PATH', RG_DEFAULT_PATH)
     try:
-        subprocess.run([ag_bin, '--version'], capture_output=True, check=True)
-        return ag_bin
+        subprocess.run([rg_bin, '--version'], capture_output=True, check=True)
+        return rg_bin
     except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
@@ -203,7 +206,7 @@ def cmd_workspace_search(args) -> int:
         return 1
     targets = _split_aliases(args.projects) or list(ws["projects"].keys())
 
-    ag_bin = _check_ag()
+    rg_bin = _check_rg()
     print(f"=== Workspace Search: '{args.pattern}' across {len(targets)} project(s) ===")
 
     for alias in targets:
@@ -215,14 +218,14 @@ def cmd_workspace_search(args) -> int:
             print(f"\n[{alias}] — PATH NOT FOUND: {project_path}")
             continue
 
-        if ag_bin:
-            cmd = [ag_bin, "--nocolor", "--numbers"]
+        if rg_bin:
+            cmd = [rg_bin, "--color=never", "-n"]
             if not args.case_sensitive:
                 cmd.append("-i")
             if args.context_lines > 0:
                 cmd.extend(["-C", str(args.context_lines)])
             if args.file_type:
-                cmd.append(f"--{args.file_type.lstrip('.')}")
+                cmd.extend(["-t", args.file_type.lstrip('.')])
             cmd.extend(["-m", str(args.max_results_per_project), args.pattern, project_path])
         else:
             cmd = ["grep", "-rn"]
@@ -533,7 +536,7 @@ def cmd_workspace_find_dependencies(args) -> int:
         print("Workspace is empty.")
         return 1
     targets = _split_aliases(args.projects) or list(ws["projects"].keys())
-    ag_bin = _check_ag()
+    rg_bin = _check_rg()
     print(f"=== Cross-Project Dependency Trace: '{args.symbol}' ===\n")
     total_refs = 0
     for alias in targets:
@@ -542,10 +545,10 @@ def cmd_workspace_find_dependencies(args) -> int:
         project_path = ws["projects"][alias]["path"]
         if not Path(project_path).is_dir():
             continue
-        if ag_bin:
-            cmd = [ag_bin, "--nocolor", "--numbers", "-m", "30"]
+        if rg_bin:
+            cmd = [rg_bin, "--color=never", "-n", "-m", "30"]
             if args.file_type:
-                cmd.append(f"--{args.file_type.lstrip('.')}")
+                cmd.extend(["-t", args.file_type.lstrip('.')])
             cmd.extend([args.symbol, project_path])
         else:
             cmd = ["grep", "-rn", "-m", "30"]

@@ -1,6 +1,6 @@
 ---
 name: filesystem
-description: Read, write, edit, search and list files on the local filesystem. Use when you need to inspect or modify files, run safe shell commands, do glob/regex search across a directory, or perform precise single-occurrence string replacements (similar to Claude Code's Edit tool). Also exposes a safe execute_command for running shell commands with dangerous verbs blocked.
+description: Read, write, edit, search and list files on the local filesystem. Use when you need to inspect or modify files, run safe shell commands, do glob/ripgrep search across a directory, or perform precise single-occurrence string replacements (similar to Claude Code's Edit tool). Content search is powered by ripgrep (`rg`); the binary is resolved from the `RG_PATH` env var (default `/usr/local/bin/rg`) and falls back to `grep` if ripgrep is missing. Also exposes a safe execute_command for running shell commands with dangerous verbs blocked.
 ---
 
 # Filesystem Skill
@@ -20,7 +20,7 @@ paths containing `..` segments.
 
 - You need to read or modify a project file and want consistent error handling
 - You need a precise single-occurrence string replacement (`edit_file`)
-- You need to glob-find files (`find_files`) or content-search (`search_files_ag`)
+- You need to glob-find files (`find_files`) or content-search (`search_files_rg`)
 - You need to run a non-destructive shell command in a known cwd
 
 When the built-in editor's read/write/edit tools are sufficient, prefer those.
@@ -40,7 +40,7 @@ commands).
 | `list_directory`      | List directory entries with sizes                    |
 | `get_file_info`       | Show stat / permissions / mtime                      |
 | `find_files`          | Recursive glob search (`*.py`, `**/*.ts`, ...)       |
-| `search_files_ag`     | Regex content search via `ag` (falls back to `grep`) |
+| `search_files_rg`     | Regex content search via `rg` ripgrep (falls back to `grep`) |
 | `create_directory`    | `mkdir -p`                                           |
 | `get_current_directory` | Print cwd                                          |
 | `execute_command`     | Run a shell command (dangerous verbs blocked)        |
@@ -70,8 +70,12 @@ python skills/filesystem/fs.py find_files src --pattern "**/*.py" --max-depth 6
 **Content search (regex, case-insensitive, 2 lines of context)**
 
 ```
-python skills/filesystem/fs.py search_files_ag "TODO\\(.*\\)" src --file-type py --context-lines 2
+python skills/filesystem/fs.py search_files_rg "TODO\\(.*\\)" src --file-type py --context-lines 2
 ```
+
+`--file-type` accepts any ripgrep type name (`rg --type-list` to enumerate).
+The binary is resolved from `RG_PATH` (default `/usr/local/bin/rg`); set
+`RG_PATH=/opt/homebrew/bin/rg` (or similar) if your install lives elsewhere.
 
 **Precise string edit (single line)**
 

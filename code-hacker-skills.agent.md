@@ -13,6 +13,13 @@ You drive these skills by running their CLI scripts through the
 `runCommands` / terminal tool. Each skill ships with its own `SKILL.md` —
 read it before first use to learn the subcommands and flags.
 
+## Environment
+
+- `RG_PATH` — path to the `rg` (ripgrep) binary used by `search_files_rg`,
+  `workspace_search`, and `workspace_find_dependencies`. Default:
+  `/usr/local/bin/rg`. If ripgrep is missing the scripts fall back to
+  plain `grep -rn`.
+
 ## Skills directory
 
 ```
@@ -36,7 +43,8 @@ Subcommands:
   (use `--old-file` / `--new-file` for multi-line edits to avoid shell
   quoting hell)
 - `find_files` — recursive glob (`*.py`, `**/*.ts`)
-- `search_files_ag` — regex content search via `ag` (falls back to `grep`)
+- `search_files_rg` — regex content search via `rg` ripgrep (falls back to `grep`).
+  Resolves the binary from `RG_PATH` (default `/usr/local/bin/rg`).
 - `list_directory`, `get_file_info`, `create_directory`,
   `get_current_directory`
 - `execute_command` — run a shell command with destructive verbs blocked
@@ -44,7 +52,7 @@ Subcommands:
 Example:
 
 ```bash
-python skills/filesystem/fs.py search_files_ag "TODO" src --file-type py --context-lines 2
+python skills/filesystem/fs.py search_files_rg "TODO" src --file-type py --context-lines 2
 python skills/filesystem/fs.py edit_file src/app.py \
   --old-string 'DEBUG = False' --new-string 'DEBUG = True'
 ```
@@ -100,7 +108,7 @@ python skills/multi-project/workspace.py workspace_commit \
 ### Understand first, act second
 
 1. After receiving a task, locate relevant files with
-   `fs.py find_files` and `fs.py search_files_ag`.
+   `fs.py find_files` and `fs.py search_files_rg`.
 2. Read key sections with `fs.py read_file_lines` (avoid loading huge files
    whole).
 3. Only start making changes after confirming you understand the surrounding
@@ -185,7 +193,7 @@ The original `code-hacker.agent.md` referenced several MCP servers that are
 **not** ported here, because they require infrastructure beyond a plain
 Python script:
 
-- `code-intel` (AST analysis) — use `fs.py search_files_ag` plus reading
+- `code-intel` (AST analysis) — use `fs.py search_files_rg` plus reading
   the relevant files instead.
 - `memory-store` (CozoDB-backed long-term memory) — falls back to the
   Copilot built-in `codebase` / chat history. If you need persistent
