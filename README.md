@@ -47,6 +47,13 @@ This repository provides reusable CLI skill implementations for environments whe
 - On Windows PowerShell, run:
   `./install.ps1`
 
+You can also install into another workspace by passing a target directory:
+
+- `./install.sh /path/to/other/workspace`
+- `./install.ps1 -TargetDir 'C:\path\to\other\workspace'`
+
+In that case, the script copies `code-hacker-skills.agent.md` and the `skills/` directory into the target workspace root.
+
 ## Notes
 
 - Each skill exposes a `--help` flag for full usage information.

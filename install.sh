@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
+TARGET_DIR="$ROOT_DIR"
+if [ $# -gt 0 ]; then
+  TARGET_DIR="$(cd "$1" && pwd)"
+fi
+
 info() { printf "\033[1;34m%s\033[0m\n" "$*"; }
 error() { printf "\033[1;31mERROR: %s\033[0m\n" "$*" >&2; exit 1; }
 
@@ -21,6 +26,21 @@ fi
 
 if [ ! -f code-hacker-skills.agent.md ]; then
   error "Manifest file code-hacker-skills.agent.md not found in repository root."
+fi
+
+if [ ! -d skills ]; then
+  error "skills directory not found in repository root."
+fi
+
+if [ "$TARGET_DIR" != "$ROOT_DIR" ]; then
+  info "Installing custom agent files into: $TARGET_DIR"
+  mkdir -p "$TARGET_DIR"
+  cp -R code-hacker-skills.agent.md "$TARGET_DIR/"
+  rm -rf "$TARGET_DIR/skills"
+  cp -R skills "$TARGET_DIR/"
+  info "Copied manifest and skills/ into target workspace."
+else
+  info "Running install validation in current repo root."
 fi
 
 info "Python OK: $($PYTHON_CMD --version 2>&1 | head -n 1)"
@@ -42,4 +62,4 @@ else
 fi
 
 info "Install script complete."
-info "Open this repository in VS Code and load code-hacker-skills.agent.md as a custom Copilot Chat agent."
+info "Open $TARGET_DIR in VS Code and load code-hacker-skills.agent.md as a custom Copilot Chat agent."
