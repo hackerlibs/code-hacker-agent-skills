@@ -40,6 +40,13 @@ This repository provides reusable CLI skill implementations for environments whe
 - Make sure Python 3 is installed on your system, because the skill scripts are Python CLI wrappers.
 - If you want to reuse the agent in another workspace, copy `code-hacker-skills.agent.md` into that workspace root or import it through the Copilot Chat custom agent interface.
 
+## Install scripts
+
+- On macOS/Linux, run:
+  `./install.sh`
+- On Windows PowerShell, run:
+  `./install.ps1`
+
 ## Notes
 
 - Each skill exposes a `--help` flag for full usage information.
